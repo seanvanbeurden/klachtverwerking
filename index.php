@@ -34,39 +34,54 @@
 
 //Import the PHPMailer class into the global namespace
 use PHPMailer\PHPMailer\PHPMailer;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
-require '../vendor/autoload.php';
+require 'vendor/autoload.php';
 
 //Create a new PHPMailer instance
 $mail = new PHPMailer();
+//Create a new Logger instance
+$log = new Logger('mailsend');
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $naam = $_POST['naam'];
     $email = $_POST['email'];
     $klacht = $_POST['klacht'];
     $file = $_POST['file'];
+    try {
+
+// create a log channel
+
+        $log->pushHandler(new StreamHandler('mail.log', Logger::INFO));
+
+// add records to the log
+        $log->info("$email");
+        $log->info("$naam");
+        $log->info("$klacht");
+    } finally {
+        echo "error";
+    }
 try {
-    $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
-    $mail->SMTPAuth = true;                                   //Enable SMTP authentication
-    $mail->Username = 'seanvbeurden@gmail.com';                     //SMTP username
-    $mail->Password = 'oQ&#rEfd0';                               //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+//    $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+    $mail->isMail();                                            //Send using SMTP
+//    $mail->Host = 'smtp.gmail.com';                     //Set the SMTP server to send through
+//    $mail->SMTPAuth = true;                                   //Enable SMTP authentication
+//    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+//    $mail->Port = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
 //Set who the message is to be sent from
-    $mail->setFrom('seanvbeurden@gmail.com', 'Sean van Beurden');
-//Set an alternative reply-to address
-    $mail->addReplyTo('seanvanbeurden@hotmail.com', 'Sean van Beurden');
+    $mail->setFrom("seanvbeurden@gmail.com", "Sean van Beurden");
+////Set an alternative reply-to address
+    $mail->addReplyTo("seanvanbeurden@hotmail.com", "Sean van Beurden");
 //Set who the message is to be sent to
-    $mail->addAddress($email, $naam);
+    $mail->addAddress("$email", "$naam");
 //Set the subject line
     $mail->Subject = 'Uw klacht is in behandeling';
 //Read an HTML message body from an external file, convert referenced images to embedded,
 //convert HTML into a basic plain-text alternative body
 //$mail->msgHTML(file_get_contents('message.html'), __DIR__);
 //Replace the plain text body with one created manually
-    $mail->Body = $klacht;
+    $mail->Body = "$klacht";
 //Attach an image file
 //$mail->addAttachment('images/phpmailer_mini.png');
 
@@ -76,7 +91,7 @@ try {
     } else {
         echo 'Message sent!';
     }
-} catch (phpmailerException $e) {
+} catch (\PHPMailer\PHPMailer\Exception $e) {
     echo $e->errorMessage();
 }
 
