@@ -66,8 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $mail->Host = 'smtp.mailtrap.io';                     //Set the SMTP server to send through
         $mail->SMTPAuth = true;                                   //Enable SMTP authentication
         $mail->Port = 2525;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-        $mail->Username = 'f16a61e57ba851';
-        $mail->Password = 'ca5a9c2f353cb1';
         $mail->setFrom('seanvbeurden@gmail.com', 'Sean van Beurden');
         $mail->addReplyTo('seanvanbeurden@hotmail.com', 'Sean van Beurden');
         $mail->addAddress($email, $naam);
